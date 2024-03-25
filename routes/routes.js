@@ -5,7 +5,9 @@ const router = express.Router();
 // Routes
 //////////////////////////////////
 const imageRoutes = require('./image.routes');
+const openaiRoutes = require('./openai.routes');
 
 router.use('/image', imageRoutes);
+router.use('/openai', openaiRoutes);
 
 module.exports = router;
