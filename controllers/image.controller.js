@@ -1,27 +1,54 @@
 const imageService = require('../services/image.service');
 
 module.exports = {
-    generateImage: async (req, res) => {
+    /**
+     * Upload an image
+     * @param {*} req 
+     * @param {*} res 
+     * @returns
+     */
+    uploadImage: async (req, res) => {
         try {
-            const { prompt } = req.body;
-            if (!prompt) {
-                return res.status(400).send('Not prompt provided');
-            }
-            // Apply image configurations...
-            // TODO: Crear clase de promptRequest
-            // TODO: Crear modelos de IAs.
-            const promptRequest = {
-                model: "dall-e-3",
-                prompt: prompt,
-                n: 1,
-                size: '1024x10242'
-            };
-            const image = await imageService.createImage(promptRequest);
-
-            res.status(201).send({ success: true, data: image.data });
+            const { originalname, mimetype, size, buffer } = req.file;
+            const image = await imageService.uploadImage(originalname, mimetype, size, buffer);
+            return res.json(image);
         } catch (error) {
-            console.log(error);
-            res.status(500).send({ success: false, error: error.error });
+            return res.status(500).json({ message: error.message });
+        }
+    },
+    /**
+     * Get an image by _id
+     * @param {*} req 
+     * @param {*} res 
+     * @returns 
+     */
+    getImage: async (req, res) => {
+        try {
+            const image = await imageService.getImageById(req.params.id);
+            if (!image) {
+              return res.status(404).json({ message: "Image not found" });
+            }
+            res.set('Content-Type', image.type);
+            return res.send(image.data);
+          } catch (error) {
+            return res.status(500).json({ message: error.message });
+          }
+      },
+    /**
+     * Delete an image by _id
+     * @param {*} req 
+     * @param {*} res 
+     * @returns 
+     */
+    deleteImage: async (req, res) => {
+        try {
+            const image = await imageService.deleteImage(req.params.id);
+            if (!image) {
+                return res.status(404).json({ message: "Image not found" });
+            }
+            return res.json(image);
+        } catch (error) {
+            return res.status(500).json({ message: error.message });
         }
     }
 }

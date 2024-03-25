@@ -1,14 +1,50 @@
-const { OpenAI } = require('openai');
-
-const configuration = {
-    apiKey: process.env.OPENAI_API_KEY,
-};
-
-const openai = new OpenAI(configuration)
+const Image = require('../models/image.model');
 
 module.exports = {
-    createImage: async (promptRequest) => {
-        // TODO: Controlar errores o cosas que tengan que ver con el servicio de OpenAI.
-        return await openai.images.generate(promptRequest);
+    /**
+     * Upload an image
+     * @param {*} originalname 
+     * @param {*} mimetype 
+     * @param {*} size
+     * @param {*} buffer 
+     * @returns 
+     */
+      uploadImage: async (originalname, mimetype, size, buffer) => {
+        try {
+          const image = new Image({
+            name: originalname,
+            type: mimetype,
+            size,
+            data: buffer
+          });
+          return await image.save();
+        } catch (error) {
+          throw new Error(`Error uploading image: ${error.message}`);
+        }
+    },
+    /**
+     * Get an image by _id
+     * @param {*} id mongoose id of the image
+     * @returns 
+     */
+    getImageById: async (id) => {
+        try {
+          return await Image.findById(id);
+        } catch (error) {
+          throw new Error(`Error retrieving image: ${error.message}`);
+        }
+    },
+    /**
+     * Delete an image by _id
+     * @param {*} id mongoose id of the image
+     * @returns 
+     */
+    deleteImage: async (id) => {
+        try {
+          return await Image.findByIdAndDelete(id);
+        }
+        catch (error) {
+          throw new Error(`Error deleting image: ${error.message}`);
+        }
     }
-};
+}
