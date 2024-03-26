@@ -50,5 +50,25 @@ module.exports = {
         } catch (error) {
             return res.status(500).json({ message: error.message });
         }
+    },
+    /**
+     * Get images with pagination
+     * @param {*} req 
+     * @param {*} res 
+     * @returns 
+     */
+    getImages: async (req, res) => {
+        try {
+            const options = {
+                page: req.query.page,
+                limit: req.query.limit,
+                sortBy: req.query.sortBy,
+                sortOrder: req.query.sortOrder
+            };
+            const images = await imageService.getImages(options);
+            return res.json(images);
+        } catch (error) {
+            return res.status(500).json({ message: error.message });
+        }
     }
 }
